@@ -1,0 +1,158 @@
+Time resolution is 1 ps
+----DATAPATH----
+	READ DATA:     x
+	X:     x Y:     x A:     x
+	ALU RESULT:     x
+/*******************************/
+-------CPU-------
+	PC: xxxx
+	INSTR: xxxxxxxxxxxxxxxx
+	CONTROL SIGNALS:
+		MEM WRITE: x
+		REG WRITE: x
+		ACC WRITE: x
+		MOV:       x
+----DATAPATH----
+	READ DATA:     3
+	X:     x Y:     x A:     0
+	ALU RESULT:     x
+/*******************************/
+-------CPU-------
+	PC: 0000
+	INSTR: 0000010000000110
+	CONTROL SIGNALS:
+		MEM WRITE: 0
+		REG WRITE: 1
+		ACC WRITE: 0
+		MOV:       0
+----DATAPATH----
+	READ DATA:     3
+	X:     3 Y:     x A:     0
+	ALU RESULT:     x
+/*******************************/
+-------CPU-------
+	PC: 0000
+	INSTR: 0000010000000110
+	CONTROL SIGNALS:
+		MEM WRITE: 0
+		REG WRITE: 1
+		ACC WRITE: 0
+		MOV:       0
+----DATAPATH----
+	READ DATA:     3
+	X:     3 Y:     x A:     0
+	ALU RESULT:     x
+/*******************************/
+-------CPU-------
+	PC: 0000
+	INSTR: 0000010000000110
+	CONTROL SIGNALS:
+		MEM WRITE: 0
+		REG WRITE: 1
+		ACC WRITE: 0
+		MOV:       0
+----DATAPATH----
+	READ DATA:     4
+	X:     3 Y:     x A:     0
+	ALU RESULT:     x
+/*******************************/
+-------CPU-------
+	PC: 0002
+	INSTR: 0000011000001000
+	CONTROL SIGNALS:
+		MEM WRITE: 0
+		REG WRITE: 1
+		ACC WRITE: 0
+		MOV:       0
+----DATAPATH----
+	READ DATA:     3
+	X:     3 Y:     4 A:     0
+	ALU RESULT:     x
+/*******************************/
+-------CPU-------
+	PC: 0004
+	INSTR: 0000101000000110
+	CONTROL SIGNALS:
+		MEM WRITE: 1
+		REG WRITE: 0
+		ACC WRITE: 0
+		MOV:       0
+----DATAPATH----
+	READ DATA:     0
+	X:     3 Y:     4 A:     0
+	ALU RESULT:     x
+/*******************************/
+-------CPU-------
+	PC: 0006
+	INSTR: 0000100000000000
+	CONTROL SIGNALS:
+		MEM WRITE: 1
+		REG WRITE: 0
+		ACC WRITE: 0
+		MOV:       0
+----DATAPATH----
+	READ DATA:     1
+	X:     3 Y:     4 A:     0
+	ALU RESULT:     6
+/*******************************/
+-------CPU-------
+	PC: 0008
+	INSTR: 1000000000000011
+	CONTROL SIGNALS:
+		MEM WRITE: 0
+		REG WRITE: 0
+		ACC WRITE: 1
+		MOV:       0
+----DATAPATH----
+	READ DATA:     3
+	X:     3 Y:     4 A:     6
+	ALU RESULT:     2
+/*******************************/
+-------CPU-------
+	PC: 000a
+	INSTR: 1000010000000001
+	CONTROL SIGNALS:
+		MEM WRITE: 0
+		REG WRITE: 0
+		ACC WRITE: 1
+		MOV:       0
+----DATAPATH----
+	READ DATA:     3
+	X:     3 Y:     4 A:     2
+	ALU RESULT:     3
+/*******************************/
+-------CPU-------
+	PC: 000c
+	INSTR: 1001100000000000
+	CONTROL SIGNALS:
+		MEM WRITE: 0
+		REG WRITE: 1
+		ACC WRITE: 0
+		MOV:       1
+----DATAPATH----
+	READ DATA:     3
+	X:     2 Y:     4 A:     2
+	ALU RESULT:     4
+/*******************************/
+-------CPU-------
+	PC: 000e
+	INSTR: 1001101000000000
+	CONTROL SIGNALS:
+		MEM WRITE: 0
+		REG WRITE: 1
+		ACC WRITE: 0
+		MOV:       1
+----DATAPATH----
+	READ DATA:     x
+	X:     2 Y:     2 A:     2
+	ALU RESULT:     x
+/*******************************/
+-------CPU-------
+	PC: 0010
+	INSTR: xxxxxxxxxxxxxxxx
+	CONTROL SIGNALS:
+		MEM WRITE: x
+		REG WRITE: x
+		ACC WRITE: x
+		MOV:       x
+$stop called at time : 120 ns : File "/home/bogdan/git/FiCPUv2/FiCPUv2.srcs/sim_1/new/test_bench.v" Line 48

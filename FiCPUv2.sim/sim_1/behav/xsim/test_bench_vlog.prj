@@ -1,0 +1,23 @@
+# compile verilog/system verilog design source files
+verilog xil_defaultlib  \
+"../../../../FiCPUv2.srcs/sources_1/new/acc_reg.v" \
+"../../../../FiCPUv2.srcs/sources_1/new/adder.v" \
+"../../../../FiCPUv2.srcs/sources_1/new/alu.v" \
+"../../../../FiCPUv2.srcs/sources_1/new/controller.v" \
+"../../../../FiCPUv2.srcs/sources_1/new/cpu.v" \
+"../../../../FiCPUv2.srcs/sources_1/new/data_mem.v" \
+"../../../../FiCPUv2.srcs/sources_1/new/data_path.v" \
+"../../../../FiCPUv2.srcs/sources_1/new/flopr.v" \
+"../../../../FiCPUv2.srcs/sources_1/new/instr_mem.v" \
+"../../../../FiCPUv2.srcs/sources_1/new/main_dec.v" \
+"../../../../FiCPUv2.srcs/sources_1/new/mux2.v" \
+"../../../../FiCPUv2.srcs/sources_1/new/reg_file.v" \
+"../../../../FiCPUv2.srcs/sources_1/new/sign_extension.v" \
+"../../../../FiCPUv2.srcs/sources_1/new/top.v" \
+"../../../../FiCPUv2.srcs/sim_1/new/test_bench.v" \
+
+# compile glbl module
+verilog xil_defaultlib "glbl.v"
+
+# Do not sort compile order
+nosort
