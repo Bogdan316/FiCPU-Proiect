@@ -25,16 +25,21 @@ module top(
     input         reset,
     output [15:0] write_data,
     output [15:0] data_addr,
-    output        mem_write
+    output        mem_write,
+    output        pop,
+    output        psh,
+    output [15:0] read_stack,
+    output [15:0] pc,
+    output [7:0]  sp,
+    output [15:0] instr       
 );
 
-wire [15:0] instr;
-wire [15:0] pc;
 wire [15:0] read_data;
+wire [15:0] write_stack;
 
 cpu cpu(
-    clk, reset, instr, read_data, 
-    mem_write, pc, data_addr, write_data
+    clk, reset, instr, read_data, read_stack, 
+    mem_write, pc, data_addr, write_data, psh, pop, write_stack
 );
     
 // fetch instruction    
@@ -48,5 +53,24 @@ data_mem dmem(
     clk, mem_write, data_addr, write_data, 
     read_data
 );
+
+// read/write data from/to stack  
+stack_mem smem(
+    clk, reset, psh, pop, write_stack, 
+    read_stack, sp
+);
+
+always @(posedge clk) begin
+    $display("/*******************************/");
+    $display("-------TOP-------");
+    $display("\tPC: %h", pc);
+    $display("\tINSTR: %b", instr);
+    $display("\tCONTROL SIGNALS:");
+    $display("\t\tMEM WRITE: %b", mem_write);
+    $display("\t\tPSH:       %b", psh);
+    $display("\t\tPOP:       %b", pop);
+    $display("\tPOP DATA: %h", read_stack);
+    $display("\tPSH DATA: %h", write_stack);
+end
        
 endmodule 

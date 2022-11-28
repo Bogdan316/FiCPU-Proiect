@@ -3,9 +3,9 @@
 // Company: 
 // Engineer: 
 // 
-// Create Date: 11/27/2022 06:00:29 PM
+// Create Date: 11/28/2022 04:21:44 PM
 // Design Name: 
-// Module Name: data_mem
+// Module Name: mux4
 // Project Name: 
 // Target Devices: 
 // Tool Versions: 
@@ -20,30 +20,15 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module data_mem (
-    input         clk, 
-    input         we,
-    input  [15:0] a,
-    input  [15:0] wd,
-    output [15:0] rd
+module mux4 # (parameter WIDTH = 8)(
+    input  [WIDTH-1:0] d0,
+    input  [WIDTH-1:0] d1,
+    input  [WIDTH-1:0] d2,
+    input  [WIDTH-1:0] d3,
+    input  [1:0]  s,
+    output [WIDTH-1:0] y
 );
 
-reg [15:0] RAM[31:0];
-
-
-assign rd = RAM[a[15:1]];
-
-integer i;
-
-
-// for testing, to be removed
-initial begin
-  for (i=0;i<=31;i=i+1)
-    RAM[i] = i;
-end
-
-always @ (posedge clk)
-    if (we)
-        RAM[a[15:1]] <= wd;
+assign y = (s[1] ? (s[0] ? d3 : d2) : (s[0] ? d1 : d0));
 
 endmodule

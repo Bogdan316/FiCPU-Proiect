@@ -25,11 +25,21 @@ module test_bench;
 reg clk;
 reg reset;
 
-wire [15:0] writedata;
-wire        memwrite;
+wire        mem_write;
+wire        pop;
+wire        psh;
+wire [7:0]  sp;
+wire [15:0] write_data;
+wire [15:0] data_addr;
+wire [15:0] pc;
+wire [15:0] read_stack;
+wire [15:0] instr;
 
 // instantiate device to be tested
-top dut (clk, reset, writedata, memwrite);
+top dut (
+    clk, reset, 
+    write_data, data_addr, mem_write, pop, psh, read_stack, pc, sp, instr
+);
 
 // initialize test
 initial
@@ -44,7 +54,7 @@ always
     end
 
 initial begin
-    #120
+    #140
     $stop;
 end
 

@@ -20,10 +20,14 @@ INFO: [VRFC 10-2263] Analyzing Verilog file "/home/bogdan/git/FiCPUv2/FiCPUv2.sr
 INFO: [VRFC 10-311] analyzing module main_dec
 INFO: [VRFC 10-2263] Analyzing Verilog file "/home/bogdan/git/FiCPUv2/FiCPUv2.srcs/sources_1/new/mux2.v" into library xil_defaultlib
 INFO: [VRFC 10-311] analyzing module mux2
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/bogdan/git/FiCPUv2/FiCPUv2.srcs/sources_1/new/mux4.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module mux4
 INFO: [VRFC 10-2263] Analyzing Verilog file "/home/bogdan/git/FiCPUv2/FiCPUv2.srcs/sources_1/new/reg_file.v" into library xil_defaultlib
 INFO: [VRFC 10-311] analyzing module reg_file
 INFO: [VRFC 10-2263] Analyzing Verilog file "/home/bogdan/git/FiCPUv2/FiCPUv2.srcs/sources_1/new/sign_extension.v" into library xil_defaultlib
 INFO: [VRFC 10-311] analyzing module sign_extension
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/bogdan/git/FiCPUv2/FiCPUv2.srcs/sources_1/new/stack_mem.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module stack_mem
 INFO: [VRFC 10-2263] Analyzing Verilog file "/home/bogdan/git/FiCPUv2/FiCPUv2.srcs/sources_1/new/top.v" into library xil_defaultlib
 INFO: [VRFC 10-311] analyzing module top
 INFO: [VRFC 10-2263] Analyzing Verilog file "/home/bogdan/git/FiCPUv2/FiCPUv2.srcs/sim_1/new/test_bench.v" into library xil_defaultlib

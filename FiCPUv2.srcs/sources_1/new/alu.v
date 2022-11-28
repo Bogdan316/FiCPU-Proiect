@@ -37,8 +37,4 @@ always @(*) begin
     endcase
 end
 
-//always @(*) begin
-//    $display("ALU: %b %h %d %d", alu_op, imm,  src_reg,  alu_result);
-//end
-
 endmodule

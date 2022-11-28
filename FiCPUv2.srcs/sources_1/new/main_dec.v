@@ -25,21 +25,27 @@ module main_dec(
     output       mem_write,
     output       reg_write,
     output       acc_write,
-    output       mov
+    output       mov,
+    output       psh,
+    output       pop
 );
 
-reg [3:0] controls;
+reg [5:0] controls;
 
-assign {mem_write, reg_write, acc_write, mov} = controls;
+assign {mem_write, reg_write, acc_write, mov, psh, pop} = controls;
 
 always @ (*)
     case(op)
-        6'b000001: controls <= 4'b0100; //LDR
-        6'b000010: controls <= 4'b1000; //STR
-        6'b100000: controls <= 4'b0010; //ADD
-        6'b100001: controls <= 4'b0010; //SUB
-        6'b100110: controls <= 4'b0101; //MOV FROM A
-        default:   controls <= 4'bxx; //???
+        // MEM OP CODES
+        6'b000001: controls <= 6'b010000; //LDR
+        6'b000010: controls <= 6'b100000; //STR
+        6'b000011: controls <= 6'b000010; //PSH
+        6'b000100: controls <= 6'b010001; //POP
+        // ALU OP CODES
+        6'b100000: controls <= 6'b001000; //ADD
+        6'b100001: controls <= 6'b001000; //SUB
+        6'b100110: controls <= 6'b010100; //MOV FROM A
+        default:   controls <= 6'bxxxxxx; //???
     endcase
     
 endmodule
