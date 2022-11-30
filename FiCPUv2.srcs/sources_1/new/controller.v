@@ -25,14 +25,16 @@ module controller(
     output       mem_write,
     output       reg_write,
     output       acc_write,
-    output       mov,
+    output       transfer_a,
     output       psh,
-    output       pop
+    output       pop,
+    output       alu_to_reg,
+    output       update_flags
 );
 
 main_dec md(
     op,
-    mem_write, reg_write, acc_write, mov, psh, pop
+    mem_write, reg_write, acc_write, transfer_a, psh, pop, alu_to_reg, update_flags
 );
 
 endmodule

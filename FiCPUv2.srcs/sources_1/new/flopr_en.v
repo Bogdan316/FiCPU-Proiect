@@ -3,9 +3,9 @@
 // Company: 
 // Engineer: 
 // 
-// Create Date: 11/28/2022 04:21:44 PM
+// Create Date: 11/30/2022 03:48:20 PM
 // Design Name: 
-// Module Name: mux4
+// Module Name: flopr_en
 // Project Name: 
 // Target Devices: 
 // Tool Versions: 
@@ -20,15 +20,17 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module mux4 # (parameter WIDTH = 8)(
-    input  [WIDTH-1:0] d0,
-    input  [WIDTH-1:0] d1,
-    input  [WIDTH-1:0] d2,
-    input  [WIDTH-1:0] d3,
-    input  [1:0]  s,
-    output [WIDTH-1:0] y
+module flopr_en # (parameter WIDTH = 8)(
+    input                  clk, 
+    input                  reset,
+    input                  en,
+    input      [WIDTH-1:0] d,
+    output reg [WIDTH-1:0] q
 );
 
-assign y = (s[1] ? (s[0] ? d3 : d2) : (s[0] ? d1 : d0));
-
+always @ (posedge clk, posedge reset)
+    if (reset)  q <= 0;
+    else if(en) q <= d;
+    else        q <= q;
+    
 endmodule

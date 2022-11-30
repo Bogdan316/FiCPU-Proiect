@@ -25,8 +25,10 @@ module data_path(
     input         reset,
     input         reg_write,
     input         acc_write,
-    input         mov,
+    input         transfer_a,
     input         pop,
+    input         alu_to_reg,
+    input         update_flags,
     input  [15:0] instr,
     input  [15:0] read_data,
     input  [15:0] read_stack,
@@ -36,6 +38,13 @@ module data_path(
     output [15:0] write_stack
 );
 
+wire zero;
+wire negative;
+wire carry;
+wire overflow;
+
+wire [3:0] flags;
+
 wire [15:0] imm_ex;
 wire [15:0] pc_next;
 wire [15:0] x;
@@ -43,6 +52,7 @@ wire [15:0] y;
 wire [15:0] a;
 wire [15:0] alu_result;
 wire [15:0] rf_data;
+wire [15:0] se_imm;
 
 // update PC on posedge clk
 flopr #(16) pc_reg(
@@ -52,7 +62,7 @@ flopr #(16) pc_reg(
 
 // inc PC to next instruction, word aligned
 adder inc_pc(
-    pc, 32'b10,
+    pc, 16'b10,
     pc_next
 );
 
@@ -63,12 +73,15 @@ sign_extension se(
 ); 
 
 // write/read to/from x or y
-// select source from data memory, stack or the acc register
-mux4 #(16) wd_reg(read_data, read_stack, a, 16'bx, {mov, pop}, rf_data);         
+// select source from data memory, stack, acc register or alu
+one_hot_encoder wd_reg(read_data, read_stack, a, alu_result, {alu_to_reg, transfer_a, pop}, rf_data);     
 reg_file rf(
     clk, reg_write, instr[9], rf_data, 
     x, y
 );
+
+// write/read to/from acc register
+acc_reg acc(clk, reset, acc_write, alu_result, a);
 
 // write to data memory
 mux2 #(16) wd_mux(x, y, instr[9], write_data);
@@ -77,13 +90,24 @@ mux2 #(16) wd_mux(x, y, instr[9], write_data);
 mux2 #(16) ws_mux(x, y, instr[9], write_stack);
 
 // compute alu operations
-alu alu(instr[15:10], instr[8:0], instr[9] ? y : x, a, alu_result); 
+sign_extension se_imm_alu(
+    instr[8:0],
+    se_imm
+);
+alu alu(
+    instr[15:10], se_imm, instr[9] ? y : x, a,
+    zero, negative, carry, overflow, alu_result
+);
 
-// write/read to/from acc register
-acc_reg acc(clk, reset, acc_write, alu_result, a);
+flopr_en #(4) flag_reg(
+    clk, reset, update_flags, {zero, negative, carry, overflow}, 
+    flags
+);
 
-always @(posedge clk) begin
+always @(negedge clk) begin
     $display("\tX: %d Y: %d A: %d", x, y, a);
+    $display("\tZNCO");
+    $display("\t%b", flags);
 end
 
 endmodule
