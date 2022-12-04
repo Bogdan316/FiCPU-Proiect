@@ -136,6 +136,8 @@ always @(negedge clk) begin
     $display("\tX: %d Y: %d A: %d", x, y, a);
     $display("\tZNCV");
     $display("\t%b", flags);
+    $display("\tBRANCH %b", branch);
+    $display("\tBRANCH %b", bra);
 end
 
 endmodule

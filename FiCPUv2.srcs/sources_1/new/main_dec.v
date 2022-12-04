@@ -51,11 +51,11 @@ always @ (*)
         6'b000100: controls <= 14'b01000100000000; //POP
         6'b000101: controls <= 14'b01000000000001; //LDR (TREAT REG VALUE AS ADDRESS)
         // BRANCH OP CODE                     
-        6'b000101: controls <= 14'b00000000100000; //BRA
-        6'b000110: controls <= 14'b00000000010000; //BRZ
-        6'b000111: controls <= 14'b00000000001000; //BRN
-        6'b001000: controls <= 14'b00000000000100; //BRC
-        6'b001001: controls <= 14'b00000000000010; //BRO
+        6'b000110: controls <= 14'b00000000100000; //BRA
+        6'b000111: controls <= 14'b00000000010000; //BRZ
+        6'b001000: controls <= 14'b00000000001000; //BRN
+        6'b001001: controls <= 14'b00000000000100; //BRC
+        6'b001010: controls <= 14'b00000000000010; //BRO
         // ALU OP CODE                         
         6'b100000: controls <= 14'b00100001000000; //ADD
         6'b100001: controls <= 14'b00100001000000; //SUB
