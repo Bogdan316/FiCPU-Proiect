@@ -39,11 +39,11 @@ wire reg_write;
 
 controller ctrl(
     instr[15:10], 
-    mem_write, reg_write, acc_write, transfer_a, psh, pop, alu_to_reg, update_flags, bra
+    mem_write, reg_write, acc_write, transfer_a, psh, pop, alu_to_reg, update_flags, bra, brz, brn, brc, bro, reg_as_addr
 );
 
 data_path  dpth(
-    clk, reset, reg_write, acc_write, transfer_a, pop, alu_to_reg, update_flags, bra, instr, read_data, read_stack, 
+    clk, reset, reg_write, acc_write, transfer_a, pop, alu_to_reg, update_flags, bra, brz, brn, brc, bro, reg_as_addr, instr, read_data, read_stack, 
     pc, data_addr, write_data, write_stack
 );
 

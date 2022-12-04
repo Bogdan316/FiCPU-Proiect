@@ -28,7 +28,7 @@ reg reset;
 wire        mem_write;
 wire        pop;
 wire        psh;
-wire [15:0]  sp;
+wire [15:0] sp;
 wire [15:0] write_data;
 wire [15:0] data_addr;
 wire [15:0] pc;

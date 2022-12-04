@@ -39,7 +39,7 @@ integer i;
 // for testing, to be removed
 initial begin
   for (i=0;i<=31;i=i+1)
-    RAM[i] = i;
+    RAM[i] = 0;
 end
 
 always @ (posedge clk)

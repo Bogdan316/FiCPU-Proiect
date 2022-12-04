@@ -22,9 +22,8 @@
 
 module alu(
     input      [5:0]  alu_op,
-    input      [15:0] imm,
-    input      [15:0] src_reg,
-    input      [15:0] acc,
+    input      [15:0] src_a,
+    input      [15:0] src_b,
     output            zero,
     output            negative,
     output            carry,
@@ -33,24 +32,23 @@ module alu(
 );
 
 reg cout;
-reg borrow;
 
 always @(*) begin
     cout = 1'b0;
-    borrow = 1'b0;
     
     case(alu_op)
-        6'b100000: alu_result = acc + src_reg + imm;             // ADD
-        6'b100001: alu_result = acc + ~(src_reg + imm) + 16'b1;  // SUB
-        6'b100110: alu_result = src_reg;                         // TRANSFER A
-        6'b100111: alu_result = imm;                             // MOV TO REG 
+        6'b100000: {cout, alu_result} = src_b + src_a;     // ADD
+        6'b100001: alu_result = src_b + ~src_a + 16'b1;    // SUB
+        6'b100110: alu_result = src_a;                     // TRANSFER A
+        6'b100111: alu_result = src_b;                     // MOV TO REG 
+        6'b101000: alu_result = src_b * src_a;             // MUL
         default:   alu_result = 16'bx;
     endcase
 end
 
-assign zero     = (alu_result == 16'b0);
-assign negative = (alu_result[15] == 1'b1);
-assign carry    = (cout == 1'b1);
-assign overflow = (borrow == 1'b1);
+assign zero     = ~(|alu_result);
+assign negative = alu_result[15];
+assign carry    = cout;
+assign overflow = (~(src_b[15] ^ src_a[15])) & (alu_result[15] ^ src_b[15]);
 
 endmodule
