@@ -1,9 +1,5 @@
-*
-!.gitignore
-!FiCPUv2.srcs/*
-!FiCPUv2.ip_user_files/mem_init_files/*
-!FiCPUv2.xpr
-!pyassembler/instructions.py
-!pyassembler/main.py
-!pyassembler/memfile.dat
-!pyassembler/test.asm
+FiCPUv2.sim
+FiCPUv2.cache
+FiCPUv2.hw
+FiCPUv2.ip_user_files
+pyassembler/__pycache__
