@@ -1,4 +1,6 @@
+import re
 from abc import ABC, abstractmethod
+from bitstring import Bits
 
 
 class AsmSyntaxError(Exception):
@@ -26,7 +28,7 @@ def get_immediate_value(imm):
 
 
 def decode_register_address(symbol):
-    assert len(symbol) == 1
+    assert len(symbol) == 1 and symbol.lower() in ['x', 'y']
     symbol = symbol.lower()
     return int(symbol == 'y')
 
@@ -58,46 +60,67 @@ class RegisterInstruction(SimpleInstruction, ABC):
 
 
 class MemoryInstruction(RegisterInstruction, ABC):
-    def __init__(self, params):
+    def __init__(self, params, mem_op_code, reg_op_code):
         self.immediate = None
+        self._op_code = None
+        self.mem_op_code = mem_op_code
+        self.reg_op_code = reg_op_code
         super().__init__(params)
 
     @property
     def op_code(self):
-        return '000001'
+        return self._op_code
 
     def parse(self):
         if len(self.params) != 1:
-            raise AsmSyntaxError(f'{self.__class__.__name__} instruction expects 1 parameter not {len(self.params)}.')
+            raise AsmSyntaxError(f'{self.__class__.__name__} instruction expects 1 parameter not {len(self.params)} '
+                                 f'(%s).' % str(self.params).replace('[', '').replace(']', ''))
 
-        if self.params[0][0] != '#':
-            raise AsmSyntaxError(f"{self.__class__.__name__} instruction expects an address starting with '#'.")
-
-        self.immediate = get_immediate_memory_addr(self.params[0])
+        if re.fullmatch(r'^#([0-9]|[A-Fa-f]){2}$', self.params[0]):
+            self.immediate = get_immediate_memory_addr(self.params[0])
+            self._op_code = self.mem_op_code
+        elif re.fullmatch(r'^\(([x,X]|[y|Y])\)$', self.params[0]):
+            self.immediate = decode_register_address(self.params[0][1])
+            self._op_code = self.reg_op_code
+        else:
+            raise AsmSyntaxError(f"{self.__class__.__name__} instruction expects an address starting with '#' or "
+                                 f"a register name surrounded by '()'.")
 
     def __str__(self):
         return f'{self.op_code}_{self.register_address}_{self.immediate:09b}'
 
 
 class Ldx(MemoryInstruction):
+    def __init__(self, params):
+        super(Ldx, self).__init__(params, '000001', '000101')
+
     @property
     def register_address(self):
         return 0
 
 
 class Ldy(MemoryInstruction):
+    def __init__(self, params):
+        super(Ldy, self).__init__(params, '000001', '000101')
+
     @property
     def register_address(self):
         return 1
 
 
 class Stx(MemoryInstruction):
+    def __init__(self, params):
+        super(Stx, self).__init__(params, '000010', None)
+
     @property
     def register_address(self):
         return 0
 
 
 class Sty(MemoryInstruction):
+    def __init__(self, params):
+        super(Sty, self).__init__(params, '000010', None)
+
     @property
     def register_address(self):
         return 1
@@ -119,7 +142,8 @@ class Mov(RegisterInstruction):
 
     def parse(self):
         if len(self.params) != 2:
-            raise AsmSyntaxError(f'{self.__class__.__name__} instruction expects 2 parameters not {len(self.params)}.')
+            raise AsmSyntaxError(f'{self.__class__.__name__} instruction expects 1 parameter not {len(self.params)} '
+                                 f'(%s).' % str(self.params).replace('[', '').replace(']', ''))
 
         if type(self.params[0]) != str and self.params[0].upper() not in ['X', 'Y']:
             raise AsmSyntaxError(f'{self.__class__.__name__} instruction expects the first parameter to be a register.')
@@ -133,31 +157,66 @@ class Mov(RegisterInstruction):
         return f'{self.op_code}_{self.register_address}_{self.immediate:09b}'
 
 
-class Bra(SimpleInstruction):
+class BranchInstruction(SimpleInstruction, ABC):
 
     def __init__(self, params):
         self.immediate = None
         super().__init__(params)
 
-    @property
-    def op_code(self):
-        return '000110'
-
     def parse(self):
         if len(self.params) != 3:
             raise AsmSyntaxError(f'{self.__class__.__name__} instruction expects 1 parameter not {len(self.params)}.')
+
         instr_line = self.params[0]
         labels_dict = self.params[1]
         label = self.params[2]
+
+        if label not in labels_dict:
+            raise AsmSyntaxError(f'{self.__class__.__name__} undefined label %s.' % label)
+
         self.immediate = labels_dict[label] - instr_line
         if self.immediate < 0:
-            pass
+            # convert to C2
+            self.immediate = Bits(int=self.immediate, length=10).bin
         else:
             self.immediate = get_immediate_value(f'${self.immediate - 1}')
 
     def __str__(self):
-        return f'{self.op_code}_{self.immediate:010b}'
-#
+        if type(self.immediate) == str:
+            return f'{self.op_code}_{self.immediate}'
+        else:
+            return f'{self.op_code}_{self.immediate:010b}'
+
+
+class Bra(BranchInstruction):
+    @property
+    def op_code(self):
+        return '000110'
+
+
+class Brz(BranchInstruction):
+    @property
+    def op_code(self):
+        return '000111'
+
+
+class Brn(BranchInstruction):
+    @property
+    def op_code(self):
+        return '001000'
+
+
+class Brc(BranchInstruction):
+    @property
+    def op_code(self):
+        return '001001'
+
+
+class Bro(BranchInstruction):
+    @property
+    def op_code(self):
+        return '001010'
+
 #
 # class Add:
 #     def __init__(self, *args):

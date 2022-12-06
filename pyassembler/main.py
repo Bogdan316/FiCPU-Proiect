@@ -16,15 +16,15 @@ class Assembler:
     def read_program_lines(self):
         program_lines = []
         with open(self.file_path) as source:
-            for line in source.readlines():
+            for num, line in enumerate(source.readlines()):
                 # remove useless whitespace
                 if not line.isspace():
-                    program_lines.append(line.strip())
+                    program_lines.append((num + 1, line.strip()))
 
         return program_lines
 
     def parse_labels(self):
-        for num, line in enumerate(self.program_lines):
+        for num, line in enumerate(map(lambda t: t[1], self.program_lines)):
             if ':' not in line:
                 continue
             label, instr = line.split(':')
@@ -36,7 +36,7 @@ class Assembler:
             self.labels[label] = num
 
     def assemble_program(self):
-        for num, line in enumerate(self.program_lines):
+        for num, (nnum, line) in enumerate(self.program_lines):
             tokens = [symbol for symbol in re.split(r':|\s|,', line) if symbol]
 
             if ':' in line:
@@ -52,10 +52,10 @@ class Assembler:
                 instr_ob = instr_class(params)
                 print(instr_ob)
             except AttributeError:
-                print("Undefined instruction '%s' at line %d." % (instr.upper(), num))
+                print("Undefined instruction '%s' at line %d." % (instr.upper(), nnum))
                 exit(1)
             except AsmSyntaxError as e:
-                print(e)
+                print('Syntax error at line %s:' % num, e)
                 exit(1)
 
 
