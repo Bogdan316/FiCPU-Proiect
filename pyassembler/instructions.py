@@ -1,93 +1,5 @@
-import re
-from abc import ABC, abstractmethod
-from bitstring import Bits
-
-
-class AsmSyntaxError(Exception):
-    def __init__(self, message):
-        super().__init__(message)
-
-
-BRANCH_INSTRUCTIONS = ('BRZ', 'BRN', 'BRC', 'BRO', 'BRA', 'JMP')
-
-
-def get_immediate_memory_addr(imm):
-    assert '#' in imm
-    # convert from hex and word align
-    imm = int(imm.replace('#', ''), 16) << 1
-    assert imm < 255
-    return imm
-
-
-def get_immediate_value(imm):
-    assert '$' in imm
-    # convert from hex
-    imm = int(imm.replace('$', ''), 16)
-    assert imm < 255
-    return imm
-
-
-def decode_register_address(symbol):
-    assert len(symbol) == 1 and symbol.lower() in ['x', 'y']
-    symbol = symbol.lower()
-    return int(symbol == 'y')
-
-
-class SimpleInstruction(ABC):
-
-    def __init__(self, params):
-        self.params = params
-        self.parse()
-
-    @property
-    @abstractmethod
-    def op_code(self):
-        raise NotImplementedError("op_code method is abstract.")
-
-    @abstractmethod
-    def parse(self):
-        raise NotImplementedError("parse method is abstract.")
-
-
-class RegisterInstruction(SimpleInstruction, ABC):
-    def __init__(self, params):
-        super().__init__(params)
-
-    @property
-    @abstractmethod
-    def register_address(self):
-        raise NotImplementedError("register_address method is abstract.")
-
-
-class MemoryInstruction(RegisterInstruction, ABC):
-    def __init__(self, params, mem_op_code, reg_op_code):
-        self.immediate = None
-        self._op_code = None
-        self.mem_op_code = mem_op_code
-        self.reg_op_code = reg_op_code
-        super().__init__(params)
-
-    @property
-    def op_code(self):
-        return self._op_code
-
-    def parse(self):
-        if len(self.params) != 1:
-            raise AsmSyntaxError(f'{self.__class__.__name__} instruction expects 1 parameter not {len(self.params)} '
-                                 f'(%s).' % str(self.params).replace('[', '').replace(']', ''))
-
-        if re.fullmatch(r'^#([0-9]|[A-Fa-f]){2}$', self.params[0]):
-            self.immediate = get_immediate_memory_addr(self.params[0])
-            self._op_code = self.mem_op_code
-        elif re.fullmatch(r'^\(([x,X]|[y|Y])\)$', self.params[0]):
-            self.immediate = decode_register_address(self.params[0][1])
-            self._op_code = self.reg_op_code
-        else:
-            raise AsmSyntaxError(f"{self.__class__.__name__} instruction expects an address starting with '#' or "
-                                 f"a register name surrounded by '()'.")
-
-    def __str__(self):
-        return f'{self.op_code}_{self.register_address}_{self.immediate:09b}'
+from abstract_instructions import MemoryInstruction, RegisterInstruction, BranchInstruction, SingleRegisterInstruction
+from utils import decode_register_address, AsmSyntaxError, get_immediate_value
 
 
 class Ldx(MemoryInstruction):
@@ -126,68 +38,6 @@ class Sty(MemoryInstruction):
         return 1
 
 
-class Mov(RegisterInstruction):
-
-    def __init__(self, params):
-        self.immediate = None
-        super().__init__(params)
-
-    @property
-    def register_address(self):
-        return decode_register_address(self.params[0])
-
-    @property
-    def op_code(self):
-        return '100111'
-
-    def parse(self):
-        if len(self.params) != 2:
-            raise AsmSyntaxError(f'{self.__class__.__name__} instruction expects 1 parameter not {len(self.params)} '
-                                 f'(%s).' % str(self.params).replace('[', '').replace(']', ''))
-
-        if type(self.params[0]) != str and self.params[0].upper() not in ['X', 'Y']:
-            raise AsmSyntaxError(f'{self.__class__.__name__} instruction expects the first parameter to be a register.')
-
-        if self.params[1][0] != '$':
-            raise AsmSyntaxError(f"{self.__class__.__name__} instruction expects numeric immediate starting with '$'.")
-
-        self.immediate = get_immediate_value(self.params[1])
-
-    def __str__(self):
-        return f'{self.op_code}_{self.register_address}_{self.immediate:09b}'
-
-
-class BranchInstruction(SimpleInstruction, ABC):
-
-    def __init__(self, params):
-        self.immediate = None
-        super().__init__(params)
-
-    def parse(self):
-        if len(self.params) != 3:
-            raise AsmSyntaxError(f'{self.__class__.__name__} instruction expects 1 parameter not {len(self.params)}.')
-
-        instr_line = self.params[0]
-        labels_dict = self.params[1]
-        label = self.params[2]
-
-        if label not in labels_dict:
-            raise AsmSyntaxError(f'{self.__class__.__name__} undefined label %s.' % label)
-
-        self.immediate = labels_dict[label] - instr_line
-        if self.immediate < 0:
-            # convert to C2
-            self.immediate = Bits(int=self.immediate, length=10).bin
-        else:
-            self.immediate = get_immediate_value(f'${self.immediate - 1}')
-
-    def __str__(self):
-        if type(self.immediate) == str:
-            return f'{self.op_code}_{self.immediate}'
-        else:
-            return f'{self.op_code}_{self.immediate:010b}'
-
-
 class Bra(BranchInstruction):
     @property
     def op_code(self):
@@ -217,49 +67,65 @@ class Bro(BranchInstruction):
     def op_code(self):
         return '001010'
 
-#
-# class Add:
-#     def __init__(self, *args):
-#         assert len(args) == 2
-#         self.reg_addr = decode_register_address(args[0])
-#         self.imm = get_immediate_value(args[1])
-#
-#     def __str__(self):
-#         return f'100000_{self.reg_addr}_{self.imm:09b}'
-#
-#
-# class Sub:
-#     def __init__(self, *args):
-#         assert len(args) == 2
-#         self.reg_addr = decode_register_address(args[0])
-#         self.imm = get_immediate_value(args[1])
-#
-#     def __str__(self):
-#         return f'100001_{self.reg_addr}_{self.imm:09b}'
-#
-#
-# class Psh:
-#     def __init__(self, *args):
-#         assert len(args) == 1
-#         self.reg_addr = decode_register_address(args[0])
-#
-#     def __str__(self):
-#         return f'000011_{self.reg_addr}_{0:09b}'
-#
-#
-# class Pop:
-#     def __init__(self, *args):
-#         assert len(args) == 1
-#         self.reg_addr = decode_register_address(args[0])
-#
-#     def __str__(self):
-#         return f'000100_{self.reg_addr}_{0:09b}'
-#
-#
-# class Mva:
-#     def __init__(self, *args):
-#         assert len(args) == 1
-#         self.reg_addr = decode_register_address(args[0])
-#
-#     def __str__(self):
-#         return f'100110_{self.reg_addr}_{0:09b}'
+
+class Add(SingleRegisterInstruction):
+    @property
+    def op_code(self):
+        return '100000'
+
+
+class Sub(SingleRegisterInstruction):
+    @property
+    def op_code(self):
+        return '100001'
+
+
+class Psh(SingleRegisterInstruction):
+
+    @property
+    def op_code(self):
+        return '000011'
+
+
+class Pop(SingleRegisterInstruction):
+    @property
+    def op_code(self):
+        return '000100'
+
+
+class Mva(SingleRegisterInstruction):
+    @property
+    def op_code(self):
+        return '100110'
+
+
+class Mov(RegisterInstruction):
+
+    def __init__(self, params):
+        self.immediate = None
+        super().__init__(params)
+
+    @property
+    def register_address(self):
+        return decode_register_address(self.params[0])
+
+    @property
+    def op_code(self):
+        return '100111'
+
+    def parse(self):
+        if len(self.params) != 2:
+            raise AsmSyntaxError(f'{self.__class__.__name__} instruction expects 1 parameter not {len(self.params)} '
+                                 f'(%s).' % str(self.params).replace('[', '').replace(']', ''))
+
+        if type(self.params[0]) != str and self.params[0].upper() not in ['X', 'Y']:
+            raise AsmSyntaxError(f'{self.__class__.__name__} instruction expects the first parameter to be a register.')
+
+        if self.params[1][0] != '$':
+            raise AsmSyntaxError(f"{self.__class__.__name__} instruction expects the second parameter to be a "
+                                 f"numeric immediate starting with '$'.")
+
+        self.immediate = get_immediate_value(self.params[1])
+
+    def __str__(self):
+        return f'{self.op_code}_{self.register_address}_{self.immediate:09b}'
