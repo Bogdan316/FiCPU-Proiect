@@ -31,11 +31,11 @@ module top(
     output [15:0] read_stack,
     output [15:0] pc,
     output [15:0] sp,
-    output [15:0] instr       
+    output [15:0] instr,       
+    output [15:0] write_stack       
 );
 
 wire [15:0] read_data;
-wire [15:0] write_stack;
 
 cpu cpu(
     clk, reset, instr, read_data, read_stack, 
@@ -44,7 +44,7 @@ cpu cpu(
     
 // fetch instruction    
 instr_mem imem(
-    pc[5:1], reset, psh, pop, write_stack,
+    clk, pc[5:1], reset, psh, pop, write_stack,
     instr, read_stack, sp
 );
 

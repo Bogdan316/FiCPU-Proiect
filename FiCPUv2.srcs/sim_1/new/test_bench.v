@@ -34,11 +34,12 @@ wire [15:0] data_addr;
 wire [15:0] pc;
 wire [15:0] read_stack;
 wire [15:0] instr;
+wire [15:0] write_stack;
 
 // instantiate device to be tested
 top dut (
     clk, reset, 
-    write_data, data_addr, mem_write, pop, psh, read_stack, pc, sp, instr
+    write_data, data_addr, mem_write, pop, psh, read_stack, pc, sp, instr, write_stack
 );
 
 // initialize test
