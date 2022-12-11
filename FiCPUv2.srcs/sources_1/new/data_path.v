@@ -35,6 +35,9 @@ module data_path(
     input         brc,
     input         bro,
     input         reg_as_addr,
+    input         hlt,
+    input         psh_pc,
+    input         pop_pc,
     input  [15:0] instr,
     input  [15:0] read_data,
     input  [15:0] read_stack,
@@ -62,6 +65,7 @@ wire [15:0] alu_result;
 wire [15:0] rf_data;
 wire [15:0] se_imm;
 wire [15:0] pc_branch;
+wire [15:0] pc_val;
 
 // sign extend immediate value
 sign_extension extend_imm(
@@ -86,13 +90,14 @@ adder inc_pc(
 
 // branch address
 adder add_pc(
-    pc_inc, se_imm << 1,
+    pc, se_imm << 1,
     pc_branch
 );
 
 // next instruction select
-mux2 #(16) pc_source(
-    pc_inc, pc_branch, branch, 
+// if hlt is asserted then stop at the current instruction
+one_hot_encoder pc_source(
+    pc_inc, pc_branch, pc, read_stack, {pop_pc, hlt, branch}, 
     pc_next
 );
 
@@ -104,24 +109,31 @@ flopr #(16) pc_reg(
 
 // write/read to/from x or y
 // select source from data memory, stack, acc register or alu
-one_hot_encoder wd_reg(read_data, read_stack, a, alu_result, {alu_to_reg, transfer_a, pop}, rf_data);     
+one_hot_encoder wd_reg(
+    read_data, read_stack, a, alu_result, {alu_to_reg, transfer_a, pop}, 
+    rf_data
+);     
 reg_file rf(
     clk, reg_write, instr[9], rf_data, 
     x, y
 );
 
 // write/read to/from acc register
-acc_reg acc(clk, reset, acc_write, alu_result, a);
+acc_reg acc(
+    clk, reset, acc_write, alu_result, 
+    a
+);
 
 // write to data memory
 mux2 #(16) wd_mux(x, y, instr[9], write_data);
 
-// write to stack memory
-mux2 #(16) ws_mux(x, y, instr[9], write_stack);
+// select source to write to stack memory
+one_hot_encoder write_stack_source(
+    x, y, pc_inc, 16'bx, {1'b0, psh_pc, instr[9]},
+    write_stack
+);
 
 // compute alu operations
-
-
 alu alu(
     instr[15:10], instr[9] ? y : x, alu_to_reg ? se_imm : a,
     zero, negative, carry, overflow, alu_result
@@ -133,11 +145,13 @@ flopr_en #(4) flag_reg(
 );
 
 always @(negedge clk) begin
-    $display("\tX: %d Y: %d A: %d", x, y, a);
-    $display("\tZNCV");
-    $display("\t%b", flags);
-    $display("\tBRANCH %b", branch);
-    $display("\tBRANCH %b", bra);
+    if(!reset) begin
+        $display("\tX: %d Y: %d A: %d", $signed(x), $signed(y), $signed(a));
+        $display("\tZNCV");
+        $display("\t%b", flags);
+        $display("\tHLT: %b", hlt);
+        $display("\tBRANCH %b", branch);
+    end
 end
 
 endmodule

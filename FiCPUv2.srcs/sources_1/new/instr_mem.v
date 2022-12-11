@@ -28,11 +28,11 @@ module instr_mem (
     input               pop,
     input        [15:0] write_stack,
     output       [15:0] rd,
-    output  reg  [15:0] read_stack,
+    output       [15:0] read_stack,
     output  reg  [15:0] sp
 );
 
-reg [15:0] RAM[31:0];
+reg [15:0] RAM[63:0];
 
 initial
     begin
@@ -44,16 +44,17 @@ assign rd = RAM[a]; // word aligned
 
 
 // stack logic
-always @(negedge clk, reset) begin
+always @(posedge clk, posedge reset) begin
     if(reset) begin
         sp = 16'h001F;
     end else if(pop) begin
         sp = sp + 1;
-        read_stack = RAM[sp];
     end else if(psh) begin
         RAM[sp] = write_stack;
         sp = sp - 1;
     end
 end
+
+assign read_stack = RAM[sp + 1];
 
 endmodule

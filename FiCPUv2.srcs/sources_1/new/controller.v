@@ -35,12 +35,15 @@ module controller(
     output       brn,
     output       brc,
     output       bro,
-    output       reg_as_addr
+    output       reg_as_addr,
+    output       hlt,
+    output       psh_pc,
+    output       pop_pc
 );
 
 main_dec md(
     op,
-    mem_write, reg_write, acc_write, transfer_a, psh, pop, alu_to_reg, update_flags, bra, brz, brn, brc, bro, reg_as_addr
+    mem_write, reg_write, acc_write, transfer_a, psh, pop, alu_to_reg, update_flags, bra, brz, brn, brc, bro, reg_as_addr, hlt, psh_pc, pop_pc
 );
 
 endmodule

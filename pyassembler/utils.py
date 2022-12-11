@@ -10,7 +10,7 @@ def get_immediate_memory_addr(imm):
     assert '#' in imm
     # convert from hex and word align
     imm = int(imm.replace('#', ''), 16) << 1
-    assert imm < 255
+    assert imm < 512
     return imm
 
 
@@ -18,7 +18,7 @@ def get_immediate_value(imm):
     assert '$' in imm
     # convert from hex
     imm = int(imm.replace('$', ''), 16)
-    assert imm < 255
+    assert imm < 512
     return imm
 
 

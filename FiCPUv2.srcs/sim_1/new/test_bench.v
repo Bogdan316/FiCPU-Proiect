@@ -28,6 +28,7 @@ reg reset;
 wire        mem_write;
 wire        pop;
 wire        psh;
+wire        psh_pc;
 wire [15:0] sp;
 wire [15:0] write_data;
 wire [15:0] data_addr;
@@ -54,9 +55,14 @@ always
         clk <= 1; # 5; clk <= 0; # 5;
     end
 
-initial begin
-    #150
-    $stop;
+// run until hlt is asserted
+always begin
+    if(instr == 16'b0) begin
+        #10;
+        $stop;
+    end else begin
+        #10;
+    end
 end
 
 endmodule

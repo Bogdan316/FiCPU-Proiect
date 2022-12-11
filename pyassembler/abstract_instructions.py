@@ -70,8 +70,8 @@ class BranchInstruction(SimpleInstruction, ABC):
 
     def parse(self):
         if len(self.params) != 3:
-            raise AsmSyntaxError(f'{self.__class__.__name__} instruction expects 1 parameter not {len(self.params)} '
-                                 f'(%s).' % str(self.params).replace('[', '').replace(']', ''))
+            raise AsmSyntaxError(f'{self.__class__.__name__} instruction expects 1 parameter not {len(self.params) - 2}'
+                                 f' (%s).' % str(self.params[2:]).replace('[', '').replace(']', ''))
 
         instr_line = self.params[0]
         labels_dict = self.params[1]
@@ -85,7 +85,7 @@ class BranchInstruction(SimpleInstruction, ABC):
             # convert to C2
             self.immediate = Bits(int=self.immediate, length=10).bin
         else:
-            self.immediate = get_immediate_value(f'${self.immediate - 1}')
+            self.immediate = get_immediate_value(f'${hex(self.immediate)}')
 
     def __str__(self):
         if type(self.immediate) == str:
@@ -105,7 +105,7 @@ class SingleRegisterInstruction(RegisterInstruction, ABC):
                                  f'(%s).' % str(self.params).replace('[', '').replace(']', ''))
 
         if self.params[0].upper() not in ['X', 'Y']:
-            raise AsmSyntaxError(f'{self.__class__.__name__} expects a register as its parameter.')
+            raise AsmSyntaxError(f'{self.__class__.__name__} expects one of the X or Y registers as its parameter.')
 
     def __str__(self):
         return f'{self.op_code}_{self.register_address}_000000000'

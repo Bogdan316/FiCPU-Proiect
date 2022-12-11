@@ -1,5 +1,34 @@
-from abstract_instructions import MemoryInstruction, RegisterInstruction, BranchInstruction, SingleRegisterInstruction
+from abstract_instructions import MemoryInstruction, RegisterInstruction, BranchInstruction, SingleRegisterInstruction, \
+    SimpleInstruction
 from utils import decode_register_address, AsmSyntaxError, get_immediate_value
+
+
+class Hlt(SimpleInstruction):
+    @property
+    def op_code(self):
+        return '000000'
+
+    def parse(self):
+        if len(self.params) != 0:
+            raise AsmSyntaxError(f'{self.__class__.__name__} instruction does not expect any parameters not '
+                                 f'{len(self.params)} (%s).' % str(self.params).replace('[', '').replace(']', ''))
+
+    def __str__(self):
+        return f'{self.op_code}_0_{0:09b}'
+
+
+class Ret(SimpleInstruction):
+    @property
+    def op_code(self):
+        return '001101'
+
+    def parse(self):
+        if len(self.params) != 0:
+            raise AsmSyntaxError(f'{self.__class__.__name__} instruction does not expect any parameters not '
+                                 f'{len(self.params)} (%s).' % str(self.params).replace('[', '').replace(']', ''))
+
+    def __str__(self):
+        return f'{self.op_code}_0_{0:09b}'
 
 
 class Ldx(MemoryInstruction):
@@ -22,7 +51,7 @@ class Ldy(MemoryInstruction):
 
 class Stx(MemoryInstruction):
     def __init__(self, params):
-        super(Stx, self).__init__(params, '000010', None)
+        super(Stx, self).__init__(params, '000010', '001011')
 
     @property
     def register_address(self):
@@ -31,7 +60,7 @@ class Stx(MemoryInstruction):
 
 class Sty(MemoryInstruction):
     def __init__(self, params):
-        super(Sty, self).__init__(params, '000010', None)
+        super(Sty, self).__init__(params, '000010', '001011')
 
     @property
     def register_address(self):
@@ -68,6 +97,12 @@ class Bro(BranchInstruction):
         return '001010'
 
 
+class Jmp(BranchInstruction):
+    @property
+    def op_code(self):
+        return '001100'
+
+
 class Add(SingleRegisterInstruction):
     @property
     def op_code(self):
@@ -78,6 +113,90 @@ class Sub(SingleRegisterInstruction):
     @property
     def op_code(self):
         return '100001'
+
+
+class Lsr(SingleRegisterInstruction):
+    @property
+    def op_code(self):
+        return '101001'
+
+
+class Lsl(SingleRegisterInstruction):
+    @property
+    def op_code(self):
+        return '101010'
+
+
+class Rsr(SingleRegisterInstruction):
+    @property
+    def op_code(self):
+        return '101011'
+
+
+class Rsl(SingleRegisterInstruction):
+    @property
+    def op_code(self):
+        return '101100'
+
+
+class Div(SingleRegisterInstruction):
+    @property
+    def op_code(self):
+        return '101101'
+
+
+class Mod(SingleRegisterInstruction):
+    @property
+    def op_code(self):
+        return '101110'
+
+
+class And(SingleRegisterInstruction):
+    @property
+    def op_code(self):
+        return '101111'
+
+
+class Or(SingleRegisterInstruction):
+    @property
+    def op_code(self):
+        return '110000'
+
+
+class Xor(SingleRegisterInstruction):
+    @property
+    def op_code(self):
+        return '110001'
+
+
+class Not(SingleRegisterInstruction):
+    @property
+    def op_code(self):
+        return '110010'
+
+
+class Inc(SingleRegisterInstruction):
+    @property
+    def op_code(self):
+        return '110011'
+
+
+class Dec(SingleRegisterInstruction):
+    @property
+    def op_code(self):
+        return '110100'
+
+
+class Cmp(SingleRegisterInstruction):
+    @property
+    def op_code(self):
+        return '110101'
+
+
+class Tst(SingleRegisterInstruction):
+    @property
+    def op_code(self):
+        return '110110'
 
 
 class Psh(SingleRegisterInstruction):

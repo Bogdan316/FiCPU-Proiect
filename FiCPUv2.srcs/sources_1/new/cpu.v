@@ -30,20 +30,23 @@ module cpu(
     output [15:0] pc,
     output [15:0] data_addr,
     output [15:0] write_data,
-    output        psh,
-    output        pop,
+    output        psh_out,
+    output        pop_out,
     output [15:0] write_stack
 );
 
 wire reg_write;
 
+assign pop_out = pop | pop_pc;
+assign psh_out = psh | psh_pc;
+
 controller ctrl(
     instr[15:10], 
-    mem_write, reg_write, acc_write, transfer_a, psh, pop, alu_to_reg, update_flags, bra, brz, brn, brc, bro, reg_as_addr
+    mem_write, reg_write, acc_write, transfer_a, psh, pop, alu_to_reg, update_flags, bra, brz, brn, brc, bro, reg_as_addr, hlt, psh_pc, pop_pc
 );
 
 data_path  dpth(
-    clk, reset, reg_write, acc_write, transfer_a, pop, alu_to_reg, update_flags, bra, brz, brn, brc, bro, reg_as_addr, instr, read_data, read_stack, 
+    clk, reset, reg_write, acc_write, transfer_a, pop, alu_to_reg, update_flags, bra, brz, brn, brc, bro, reg_as_addr, hlt, psh_pc, pop_pc, instr, read_data, read_stack, 
     pc, data_addr, write_data, write_stack
 );
 

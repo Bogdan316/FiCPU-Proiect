@@ -64,7 +64,7 @@ class Assembler:
         new_lines = [line + '\n' for line in self.assembled_program[:-1]]
         new_lines.append(self.assembled_program[-1])
 
-        with open('memfile.dat', 'w') as out:
+        with open('/home/bogdan/git/FiCPUv2/FiCPUv2.srcs/sim_1/imports/FiCPU/memfile.dat', 'w') as out:
             out.writelines(new_lines)
 
 

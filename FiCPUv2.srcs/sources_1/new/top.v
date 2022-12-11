@@ -39,7 +39,7 @@ wire [15:0] read_data;
 
 cpu cpu(
     clk, reset, instr, read_data, read_stack, 
-    mem_write, pc, data_addr, write_data, psh, pop, write_stack
+    mem_write, pc, data_addr, write_data, psh, pop,  write_stack
 );
     
 // fetch instruction    
@@ -55,15 +55,18 @@ data_mem dmem(
 );
 
 always @(posedge clk) begin
-    $display("/*******************************/");
-    $display("\tPC: %h", pc);
-    $display("\tINSTR: %b", instr);
-    $display("\tCONTROL SIGNALS:");
-    $display("\t\tMEM WRITE: %b", mem_write);
-    $display("\t\tPSH:       %b", psh);
-    $display("\t\tPOP:       %b", pop);
-    $display("\tPOP DATA: %h", read_stack);
-    $display("\tPSH DATA: %h", write_stack);
+    if(!reset) begin
+        $display("/*******************************/");
+        $display("\tPC: %d", pc);
+        $display("\tLINE: %d", (pc >> 1) + 1);
+        $display("\tINSTR: %b", instr);
+        $display("\tCONTROL SIGNALS:");
+        $display("\t\tMEM WRITE: %b", mem_write);
+        $display("\t\tPSH:       %b", psh);
+        $display("\t\tPOP:       %b", pop);
+        $display("\tPOP DATA: %h", read_stack);
+        $display("\tPSH DATA: %h", write_stack);
+    end
 end
        
 endmodule 
