@@ -83,6 +83,7 @@ always @ (*)
         6'b110100: controls <= 17'b01000011000000000; // DEC
         6'b110101: controls <= 17'b00000001000000000; // CMP
         6'b110110: controls <= 17'b00000001000000000; // TST
+        6'b110111: controls <= 17'b00100001000000000; // TRANSFER REG TO ACC
         default:   controls <= 17'bxxxxxxxxxxxxxxxxx; // ???
     endcase
     

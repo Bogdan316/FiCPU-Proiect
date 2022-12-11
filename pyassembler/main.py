@@ -5,8 +5,10 @@ import re
 
 
 class Assembler:
-    def __init__(self, file_path):
+    def __init__(self, file_path, output_file_path):
         self.file_path = file_path
+        self.output_file_path = output_file_path
+
         self.labels = {}
         self.assembled_program = []
 
@@ -20,7 +22,7 @@ class Assembler:
         with open(self.file_path) as source:
             for num, line in enumerate(source.readlines()):
                 # remove useless whitespace
-                if not line.isspace():
+                if not line.isspace() and line[0] != ';':
                     program_lines.append((num + 1, line.strip()))
 
         return program_lines
@@ -39,6 +41,10 @@ class Assembler:
 
     def assemble_program(self):
         for num, (orig_num, line) in enumerate(self.program_lines):
+
+            if len(line) == 0 or line.isspace() or line[0] == ';':
+                continue
+
             tokens = [symbol for symbol in re.split(r':|\s|,', line) if symbol]
 
             if ':' in line:
@@ -57,20 +63,21 @@ class Assembler:
                 print("Undefined instruction '%s' at line %d." % (instr.upper(), orig_num))
                 exit(1)
             except AsmSyntaxError as e:
-                print('Syntax error at line %s:' % num, e)
+                print('Syntax error at line %s:' % orig_num, e)
                 exit(1)
 
     def write_program(self):
         new_lines = [line + '\n' for line in self.assembled_program[:-1]]
         new_lines.append(self.assembled_program[-1])
 
-        with open('/home/bogdan/git/FiCPUv2/FiCPUv2.srcs/sim_1/imports/FiCPU/memfile.dat', 'w') as out:
+        with open(self.output_file_path, 'w') as out:
             out.writelines(new_lines)
 
 
 if __name__ == '__main__':
     arg_parser = argparse.ArgumentParser()
     arg_parser.add_argument('src')
+    arg_parser.add_argument('-o', '--output_file', default='memfile.dat')
 
     cmd_args = arg_parser.parse_args()
-    assembler = Assembler(cmd_args.src)
+    assembler = Assembler(cmd_args.src, cmd_args.output_file)

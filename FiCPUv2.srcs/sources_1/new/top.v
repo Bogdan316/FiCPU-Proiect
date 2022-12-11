@@ -44,7 +44,7 @@ cpu cpu(
     
 // fetch instruction    
 instr_mem imem(
-    clk, pc[5:1], reset, psh, pop, write_stack,
+    clk, pc[15:1], reset, psh, pop, write_stack,
     instr, read_stack, sp
 );
 

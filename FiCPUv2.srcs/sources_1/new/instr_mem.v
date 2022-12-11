@@ -22,7 +22,7 @@
 
 module instr_mem (
     input               clk,
-    input        [4:0]  a,
+    input        [14:0] a,
     input               reset,
     input               psh,
     input               pop,
@@ -46,7 +46,7 @@ assign rd = RAM[a]; // word aligned
 // stack logic
 always @(posedge clk, posedge reset) begin
     if(reset) begin
-        sp = 16'h001F;
+        sp = 16'h003F;
     end else if(pop) begin
         sp = sp + 1;
     end else if(psh) begin

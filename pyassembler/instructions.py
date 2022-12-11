@@ -115,6 +115,12 @@ class Sub(SingleRegisterInstruction):
         return '100001'
 
 
+class Mul(SingleRegisterInstruction):
+    @property
+    def op_code(self):
+        return '101000'
+
+
 class Lsr(SingleRegisterInstruction):
     @property
     def op_code(self):
@@ -216,6 +222,12 @@ class Mva(SingleRegisterInstruction):
     @property
     def op_code(self):
         return '100110'
+
+
+class Mvr(SingleRegisterInstruction):
+    @property
+    def op_code(self):
+        return '110111'
 
 
 class Mov(RegisterInstruction):

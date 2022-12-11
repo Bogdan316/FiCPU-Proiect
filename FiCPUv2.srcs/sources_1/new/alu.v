@@ -56,6 +56,7 @@ always @(*) begin
         6'b110100: alu_result = src_a - 16'b1;                                             // DEC REG
         6'b110101: alu_result = src_b + ~src_a + 16'b1;                                    // CMP
         6'b110110: alu_result = src_b & src_a;                                             // TST
+        6'b110111: alu_result = src_a;                                                     // TRANSFER REG
         default:   alu_result = 16'bx;
     endcase
 end
