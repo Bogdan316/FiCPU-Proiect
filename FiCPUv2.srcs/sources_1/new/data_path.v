@@ -26,6 +26,7 @@ module data_path(
     input         reg_write,
     input         acc_write,
     input         transfer_a,
+    input         psh,
     input         pop,
     input         alu_to_reg,
     input         update_flags,
@@ -44,7 +45,11 @@ module data_path(
     output [15:0] pc,
     output [15:0] data_addr,
     output [15:0] write_data,
-    output [15:0] write_stack
+    output [15:0] write_stack,
+    output [15:0] sp,
+    output [15:0] a,
+    output [15:0] x,
+    output [15:0] y
 );
 
 wire zero;
@@ -58,9 +63,6 @@ wire [3:0] flags;
 wire [15:0] imm_ex;
 wire [15:0] pc_inc;
 wire [15:0] pc_next;
-wire [15:0] x;
-wire [15:0] y;
-wire [15:0] a;
 wire [15:0] alu_result;
 wire [15:0] rf_data;
 wire [15:0] se_imm;
@@ -142,6 +144,12 @@ alu alu(
 flopr_en #(4) flag_reg(
     clk, reset, update_flags, {zero, negative, carry, overflow}, 
     flags
+);
+
+// stack logic 
+stack st(
+    clk, reset, psh | psh_pc, pop | pop_pc,
+    sp
 );
 
 always @(negedge clk) begin

@@ -28,19 +28,21 @@ reg reset;
 wire        mem_write;
 wire        pop;
 wire        psh;
-wire        psh_pc;
-wire [15:0] sp;
 wire [15:0] write_data;
 wire [15:0] data_addr;
 wire [15:0] pc;
 wire [15:0] read_stack;
 wire [15:0] instr;
 wire [15:0] write_stack;
+wire [15:0] sp;
+wire [15:0] a;
+wire [15:0] x;
+wire [15:0] y;
 
 // instantiate device to be tested
 top dut (
     clk, reset, 
-    write_data, data_addr, mem_write, pop, psh, read_stack, pc, sp, instr, write_stack
+    write_data, data_addr, mem_write, pop, psh, read_stack, pc, instr, write_stack, sp, a, x, y
 );
 
 // initialize test

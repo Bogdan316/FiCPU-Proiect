@@ -30,22 +30,25 @@ module top(
     output        psh,
     output [15:0] read_stack,
     output [15:0] pc,
-    output [15:0] sp,
     output [15:0] instr,       
-    output [15:0] write_stack       
+    output [15:0] write_stack,       
+    output [15:0] sp,      
+    output [15:0] a,      
+    output [15:0] x,      
+    output [15:0] y      
 );
 
 wire [15:0] read_data;
 
 cpu cpu(
     clk, reset, instr, read_data, read_stack, 
-    mem_write, pc, data_addr, write_data, psh, pop,  write_stack
+    mem_write, pc, data_addr, write_data, psh, pop,  write_stack, sp, a, x, y
 );
     
 // fetch instruction    
 instr_mem imem(
-    clk, pc[15:1], reset, psh, pop, write_stack,
-    instr, read_stack, sp
+    clk, pc[15:1], reset, psh, sp, write_stack,
+    instr, read_stack
 );
 
 // read/write data from/to memory or from/to stack                  
