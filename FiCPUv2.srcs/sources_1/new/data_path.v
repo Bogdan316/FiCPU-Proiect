@@ -155,6 +155,7 @@ stack st(
 always @(negedge clk) begin
     if(!reset) begin
         $display("\tX: %d Y: %d A: %d", $signed(x), $signed(y), $signed(a));
+        $display("\tIMMEDIATE %d", $signed(se_imm));
         $display("\tZNCV");
         $display("\t%b", flags);
         $display("\tHLT: %b", hlt);

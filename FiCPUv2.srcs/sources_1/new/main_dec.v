@@ -84,6 +84,13 @@ always @ (*)
         6'b110101: controls <= 17'b00000001000000000; // CMP
         6'b110110: controls <= 17'b00000001000000000; // TST
         6'b110111: controls <= 17'b00100001000000000; // TRANSFER REG TO ACC
+        6'b111000: controls <= 17'b01000011000000000; // ADDI
+        6'b111001: controls <= 17'b01000011000000000; // SUBI
+        6'b111010: controls <= 17'b01000011000000000; // MULI
+        6'b111011: controls <= 17'b01000011000000000; // LSRI
+        6'b111100: controls <= 17'b01000011000000000; // LSLI
+        6'b111101: controls <= 17'b01000011000000000; // DIVI
+        6'b111110: controls <= 17'b01000011000000000; // MODI
         default:   controls <= 17'bxxxxxxxxxxxxxxxxx; // ???
     endcase
     

@@ -1,5 +1,5 @@
 from abstract_instructions import MemoryInstruction, RegisterInstruction, BranchInstruction, SingleRegisterInstruction, \
-    SimpleInstruction
+    SimpleInstruction, RegisterAndImmediateInstruction
 from utils import decode_register_address, AsmSyntaxError, get_immediate_value
 
 
@@ -230,33 +230,49 @@ class Mvr(SingleRegisterInstruction):
         return '110111'
 
 
-class Mov(RegisterInstruction):
-
-    def __init__(self, params):
-        self.immediate = None
-        super().__init__(params)
-
-    @property
-    def register_address(self):
-        return decode_register_address(self.params[0])
-
+class Mov(RegisterAndImmediateInstruction):
     @property
     def op_code(self):
         return '100111'
 
-    def parse(self):
-        if len(self.params) != 2:
-            raise AsmSyntaxError(f'{self.__class__.__name__} instruction expects 1 parameter not {len(self.params)} '
-                                 f'(%s).' % str(self.params).replace('[', '').replace(']', ''))
 
-        if type(self.params[0]) != str and self.params[0].upper() not in ['X', 'Y']:
-            raise AsmSyntaxError(f'{self.__class__.__name__} instruction expects the first parameter to be a register.')
+class Addi(RegisterAndImmediateInstruction):
+    @property
+    def op_code(self):
+        return '111000'
 
-        if self.params[1][0] != '$':
-            raise AsmSyntaxError(f"{self.__class__.__name__} instruction expects the second parameter to be a "
-                                 f"numeric immediate starting with '$'.")
 
-        self.immediate = get_immediate_value(self.params[1])
+class Subi(RegisterAndImmediateInstruction):
+    @property
+    def op_code(self):
+        return '111001'
 
-    def __str__(self):
-        return f'{self.op_code}_{self.register_address}_{self.immediate:09b}'
+
+class Muli(RegisterAndImmediateInstruction):
+    @property
+    def op_code(self):
+        return '111010'
+
+
+class Lsri(RegisterAndImmediateInstruction):
+    @property
+    def op_code(self):
+        return '111011'
+
+
+class Lsli(RegisterAndImmediateInstruction):
+    @property
+    def op_code(self):
+        return '111100'
+
+
+class Divi(RegisterAndImmediateInstruction):
+    @property
+    def op_code(self):
+        return '111101'
+
+
+class Modi(RegisterAndImmediateInstruction):
+    @property
+    def op_code(self):
+        return '111110'

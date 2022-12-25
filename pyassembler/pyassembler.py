@@ -2,6 +2,7 @@ import instructions
 from utils import BRANCH_INSTRUCTIONS, AsmSyntaxError
 import argparse
 import re
+import macros
 
 
 class Assembler:
@@ -11,21 +12,44 @@ class Assembler:
 
         self.labels = {}
         self.assembled_program = []
+        self.expanded_program = []
+        self.program_lines = []
 
-        self.program_lines = self.read_program_lines()
+        self.expand_macros()
+        self.read_program_lines()
         self.parse_labels()
         self.assemble_program()
         self.write_program()
 
-    def read_program_lines(self):
-        program_lines = []
+    def expand_macros(self):
         with open(self.file_path) as source:
             for num, line in enumerate(source.readlines()):
-                # remove useless whitespace
-                if not line.isspace() and line[0] != ';':
-                    program_lines.append((num + 1, line.strip()))
+                striped_line = line.strip()
+                if len(striped_line) and striped_line[0] == '#':
+                    if not re.fullmatch(r'#[a-zA-Z]\w*\(.*\)', striped_line):
+                        print("Invalid macro call at line %d." % num)
+                        exit(1)
 
-        return program_lines
+                    macro = re.split(r'\(.*\)', striped_line)[0][1:].strip()
+                    params = striped_line.split('(')[1].replace(')', '').split(',')
+                    params = tuple(p.strip() for p in params)
+                    try:
+                        macro_func = getattr(macros, macro.lower())
+                        self.expanded_program.extend(macro_func(*params))
+                    except AttributeError:
+                        print("Undefined macro '%s' at line %d." % (macro.upper(), num))
+                        exit(1)
+                    except AsmSyntaxError as e:
+                        print('Syntax error at line %s:' % num, e)
+                        exit(1)
+                else:
+                    self.expanded_program.append(line)
+
+    def read_program_lines(self):
+        for num, line in enumerate(self.expanded_program):
+            # remove useless whitespace
+            if not line.isspace() and line[0] != ';':
+                self.program_lines.append((num + 1, line.strip()))
 
     def parse_labels(self):
         for num, line in enumerate(map(lambda t: t[1], self.program_lines)):

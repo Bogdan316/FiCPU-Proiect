@@ -38,10 +38,10 @@ always @(*) begin
     
     case(alu_op)
         6'b100000: {cout, alu_result} = src_b + src_a;                                     // ADD
-        6'b100001: alu_result = src_b + ~src_a + 16'b1;                                    // SUB
+        6'b100001: alu_result = src_b + ~src_a + 16'b1;                                    // SUB 
         6'b100110: alu_result = src_a;                                                     // TRANSFER A
         6'b100111: alu_result = src_b;                                                     // MOV TO REG 
-        6'b101000: alu_result = src_b * src_a;                                             // MUL
+        6'b101000: alu_result = src_b[7:0] * src_a[7:0];                                   // MUL
         6'b101001: alu_result = src_b >> src_a;                                            // LSR
         6'b101010: alu_result = src_b << src_a;                                            // LSL
         6'b101011: alu_result = (src_b >> src_a) | (src_b << (16'h10 - src_a));            // RSR
@@ -57,6 +57,13 @@ always @(*) begin
         6'b110101: alu_result = src_b + ~src_a + 16'b1;                                    // CMP
         6'b110110: alu_result = src_b & src_a;                                             // TST
         6'b110111: alu_result = src_a;                                                     // TRANSFER REG
+        6'b111000: {cout, alu_result} = src_a + src_b;                                     // ADDI                                           
+        6'b111001: alu_result = src_a + ~src_b + 16'b1;                                    // SUBI                                         
+        6'b111010: alu_result = src_b[7:0] * src_a[7:0];                                   // MULI                                         
+        6'b111011: alu_result = src_a >> src_b;                                            // LSRI                                         
+        6'b111100: alu_result = src_a << src_b;                                            // LSLI                                         
+        6'b111101: alu_result = $signed(src_a[7:0]) / $signed(src_b[7:0]);                 // DIVI                                         
+        6'b111110: alu_result = src_a % src_b;                                             // MODI                                         
         default:   alu_result = 16'bx;
     endcase
 end

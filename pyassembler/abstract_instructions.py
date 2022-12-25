@@ -45,8 +45,8 @@ class MemoryInstruction(RegisterInstruction, ABC):
 
     def parse(self):
         if len(self.params) != 1:
-            raise AsmSyntaxError(f'{self.__class__.__name__} instruction expects 1 parameter not {len(self.params)} '
-                                 f'(%s).' % str(self.params).replace('[', '').replace(']', ''))
+            raise AsmSyntaxError(f'{self.__class__.__name__.upper()} instruction expects 1 parameter not '
+                                 f'{len(self.params)} (%s).' % str(self.params).replace('[', '').replace(']', ''))
 
         if re.fullmatch(r'^#([0-9]|[A-Fa-f]){2}$', self.params[0]):
             self.immediate = get_immediate_memory_addr(self.params[0])
@@ -55,8 +55,8 @@ class MemoryInstruction(RegisterInstruction, ABC):
             self.immediate = decode_register_address(self.params[0][1])
             self._op_code = self.reg_op_code
         else:
-            raise AsmSyntaxError(f"{self.__class__.__name__} instruction expects an address starting with '#' or "
-                                 f"a register name surrounded by '()'.")
+            raise AsmSyntaxError(f"{self.__class__.__name__.upper()} instruction expects an address starting with "
+                                 f"'#' or a register name surrounded by '()'.")
 
     def __str__(self):
         return f'{self.op_code}_{self.register_address}_{self.immediate:09b}'
@@ -70,15 +70,15 @@ class BranchInstruction(SimpleInstruction, ABC):
 
     def parse(self):
         if len(self.params) != 3:
-            raise AsmSyntaxError(f'{self.__class__.__name__} instruction expects 1 parameter not {len(self.params) - 2}'
-                                 f' (%s).' % str(self.params[2:]).replace('[', '').replace(']', ''))
+            raise AsmSyntaxError(f'{self.__class__.__name__.upper()} instruction expects 1 parameter not '
+                                 f'{len(self.params) - 2} (%s).' % str(self.params[2:]).replace('[', '').replace(']', ''))
 
         instr_line = self.params[0]
         labels_dict = self.params[1]
         label = self.params[2]
 
         if label not in labels_dict:
-            raise AsmSyntaxError(f'{self.__class__.__name__} undefined label %s.' % label)
+            raise AsmSyntaxError(f'{self.__class__.__name__.upper()} undefined label %s.' % label)
 
         self.immediate = labels_dict[label] - instr_line
         if self.immediate < 0:
@@ -101,11 +101,40 @@ class SingleRegisterInstruction(RegisterInstruction, ABC):
 
     def parse(self):
         if len(self.params) != 1:
-            raise AsmSyntaxError(f'{self.__class__.__name__} instruction expects 1 parameter not {len(self.params)} '
-                                 f'(%s).' % str(self.params).replace('[', '').replace(']', ''))
+            raise AsmSyntaxError(f'{self.__class__.__name__.upper()} instruction expects 1 parameter not '
+                                 f'{len(self.params)} (%s).' % str(self.params).replace('[', '').replace(']', ''))
 
         if self.params[0].upper() not in ['X', 'Y']:
-            raise AsmSyntaxError(f'{self.__class__.__name__} expects one of the X or Y registers as its parameter.')
+            raise AsmSyntaxError(f'{self.__class__.__name__.upper()} expects one of the X or Y registers as its '
+                                 f'parameter.')
 
     def __str__(self):
         return f'{self.op_code}_{self.register_address}_000000000'
+
+
+class RegisterAndImmediateInstruction(RegisterInstruction, ABC):
+    def __init__(self, params):
+        self.immediate = None
+        super().__init__(params)
+
+    @property
+    def register_address(self):
+        return decode_register_address(self.params[0])
+
+    def parse(self):
+        if len(self.params) != 2:
+            raise AsmSyntaxError(f'{self.__class__.__name__.upper()} instruction expects 1 parameter not '
+                                 f'{len(self.params)} (%s).' % str(self.params).replace('[', '').replace(']', ''))
+
+        if type(self.params[0]) != str or self.params[0].upper() not in ['X', 'Y']:
+            raise AsmSyntaxError(f'{self.__class__.__name__.upper()} instruction expects the first parameter '
+                                 f'to be a register.')
+
+        if self.params[1][0] != '$':
+            raise AsmSyntaxError(f"{self.__class__.__name__.upper()} instruction expects the second parameter "
+                                 f"to be a numeric immediate starting with '$'.")
+
+        self.immediate = get_immediate_value(self.params[1])
+
+    def __str__(self):
+        return f'{self.op_code}_{self.register_address}_{self.immediate:09b}'
