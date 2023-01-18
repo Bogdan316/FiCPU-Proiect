@@ -1,0 +1,14 @@
+;0.015625
+#MOV_WORD(X, $2400)
+MVR X
+;4
+#MOV_WORD(X, $4400)
+FPMUL X
+;res = 0.625
+
+;0.5
+#MOV_WORD(Y, $3800)
+MVR Y
+FPADD Y
+;res = 1
+HLT

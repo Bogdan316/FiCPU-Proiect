@@ -276,3 +276,21 @@ class Modi(RegisterAndImmediateInstruction):
     @property
     def op_code(self):
         return '111110'
+
+
+class Fpadd(SingleRegisterInstruction):
+    @property
+    def op_code(self):
+        return '001110'
+
+
+class Fpmul(SingleRegisterInstruction):
+    @property
+    def op_code(self):
+        return '001111'
+
+
+class Fpsub(SingleRegisterInstruction):
+    @property
+    def op_code(self):
+        return '010000'

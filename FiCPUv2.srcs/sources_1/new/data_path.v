@@ -39,6 +39,7 @@ module data_path(
     input         hlt,
     input         psh_pc,
     input         pop_pc,
+    input         fpu_to_acc,
     input  [15:0] instr,
     input  [15:0] read_data,
     input  [15:0] read_stack,
@@ -68,6 +69,7 @@ wire [15:0] rf_data;
 wire [15:0] se_imm;
 wire [15:0] pc_branch;
 wire [15:0] pc_val;
+wire [15:0] fpu_result;
 
 // sign extend immediate value
 sign_extension extend_imm(
@@ -122,7 +124,7 @@ reg_file rf(
 
 // write/read to/from acc register
 acc_reg acc(
-    clk, reset, acc_write, alu_result, 
+    clk, reset, acc_write, fpu_to_acc ? fpu_result : alu_result, 
     a
 );
 
@@ -152,9 +154,16 @@ stack st(
     sp
 );
 
+// FPU logic
+fpu fp(
+    instr[15:10], a, instr[9] ? y : x,
+    fpu_result
+);
+
 always @(negedge clk) begin
     if(!reset) begin
         $display("\tX: %d Y: %d A: %d", $signed(x), $signed(y), $signed(a));
+        $display("\tX: %h Y: %h A: %h", x, y, a);
         $display("\tIMMEDIATE %d", $signed(se_imm));
         $display("\tZNCV");
         $display("\t%b", flags);
